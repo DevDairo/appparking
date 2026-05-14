@@ -1,75 +1,41 @@
 import { useState } from 'react';
+import Login from './components/Login/Login';
+import Layout from './components/Layout/Layout';
+import Dashboard from './components/Dashboard/Dashboard';
 import PropietarioList from './components/Propietarios/PropietarioList';
 import ParqueaderoList from './components/Parqueaderos/ParqueaderoList';
 import CarroList from './components/Carros/CarroList';
 import EspacioList from './components/Espacios/EspacioList';
+import './styles/globals.css';
+import './styles/components.css';
 
-function App() {
-    const [modulo, setModulo] = useState('propietarios');
+export default function App() {
+  const [user,   setUser]   = useState(null);   // null = not logged in
+  const [module, setModule] = useState('dashboard');
 
-    const estiloNav = {
-        backgroundColor: '#1a1a2e',
-        padding: '1rem',
-        display: 'flex',
-        gap: '10px',
-        alignItems: 'center'
-    };
+  if (!user) {
+    return <Login onLogin={setUser} />;
+  }
 
-    const estiloBoton = (nombre) => ({
-        padding: '8px 16px',
-        backgroundColor: modulo === nombre ? '#e94560' : '#16213e',
-        color: 'white',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontWeight: modulo === nombre ? 'bold' : 'normal'
-    });
+  const renderModule = () => {
+    switch (module) {
+      case 'dashboard':     return <Dashboard onNavigate={setModule} />;
+      case 'propietarios':  return <PropietarioList />;
+      case 'parqueaderos':  return <ParqueaderoList />;
+      case 'carros':        return <CarroList />;
+      case 'espacios':      return <EspacioList />;
+      default:              return <Dashboard onNavigate={setModule} />;
+    }
+  };
 
-    const estiloTitulo = {
-        color: 'white',
-        margin: '0',
-        marginRight: '20px',
-        fontSize: '1.3rem'
-    };
-
-    return (
-        <div>
-            <nav style={estiloNav}>
-                <h1 style={estiloTitulo}>AppParking</h1>
-                <button
-                    style={estiloBoton('propietarios')}
-                    onClick={() => setModulo('propietarios')}
-                >
-                    Propietarios
-                </button>
-                <button
-                    style={estiloBoton('parqueaderos')}
-                    onClick={() => setModulo('parqueaderos')}
-                >
-                    Parqueaderos
-                </button>
-                <button
-                    style={estiloBoton('carros')}
-                    onClick={() => setModulo('carros')}
-                >
-                    Carros
-                </button>
-                <button
-                    style={estiloBoton('espacios')}
-                    onClick={() => setModulo('espacios')}
-                >
-                    Espacios
-                </button>
-            </nav>
-
-            <div style={{ padding: '1rem' }}>
-                {modulo === 'propietarios' && <PropietarioList />}
-                {modulo === 'parqueaderos' && <ParqueaderoList />}
-                {modulo === 'carros' && <CarroList />}
-                {modulo === 'espacios' && <EspacioList />}
-            </div>
-        </div>
-    );
+  return (
+    <Layout
+      activeModule={module}
+      onNavigate={setModule}
+      user={user}
+      onLogout={() => setUser(null)}
+    >
+      {renderModule()}
+    </Layout>
+  );
 }
-
-export default App;
